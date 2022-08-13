@@ -247,8 +247,7 @@ jobs:
       if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
       working-directory: ./v8/
       run: |
-        git fetch origin 904c8cedf85c7223f96ea084953089fea9a36bdd
-        git cherry-pick 904c8cedf85c7223f96ea084953089fea9a36bdd
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -374,8 +373,7 @@ jobs:
       if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
       working-directory: ./v8/
       run: |
-        git fetch origin 904c8cedf85c7223f96ea084953089fea9a36bdd
-        git cherry-pick 904c8cedf85c7223f96ea084953089fea9a36bdd
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
     - name: Remove compiler flags
       working-directory: ./v8/build/config/compiler
       run: |
