@@ -6,31 +6,23 @@ on:
       v8_revision:
         description: 'V8 TAG(Branch) to build'
         type: string
-        default: '9.8-lkgr'
+        default: '10.4.132.22'
         required: true
       build_args:
         description: 'Build args'
         type: string
         default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=false'
         required: true
-      package_tag:
-        description: 'Package TAG'
-        type: string
-        default: '9.8-lkgr'
-        required: true
-      hip_v8_root:
-        description: 'HIP V8 root path'
-        type: string
-        default: 'global_packages'
-        require: true
-      writing_mode:
-        description: 'The mode of writing'
-        type: choice
-        options:
-        - preserve
-        - overwrite
-        default: 'preserve'
-        required: true
+      # package_tag:
+      #   description: 'Package TAG'
+      #   type: string
+      #   default: '10.4.132.22'
+      #   required: true
+      # hip_v8_root:
+      #   description: 'HIP V8 root path'
+      #   type: string
+      #   default: 'global_packages'
+      #   require: true
       is_build_for_android:
         description: 'Build for Android platform'
         type: boolean
