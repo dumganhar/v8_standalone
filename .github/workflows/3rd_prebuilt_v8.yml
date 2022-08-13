@@ -53,42 +53,42 @@ on:
         default: false
 
 env:
-  publish_package_script: |
-    from qcloud_cos import CosS3Client, CosConfig
-    import hashlib
-    import os
-    try:
-        from urllib.parse import urlencode
-    except ImportError:
-        from urllib import urlencode
+  # publish_package_script: |
+  #   from qcloud_cos import CosS3Client, CosConfig
+  #   import hashlib
+  #   import os
+  #   try:
+  #       from urllib.parse import urlencode
+  #   except ImportError:
+  #       from urllib import urlencode
 
-    metadata = {}
-    metadata["ci-name"] = "Github Action"
-    metadata["ci-id"] = "${{ github.run_id }}"
-    metadata["ci-url"] = "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-    metadata["v8-builder"] = "${{ github.event.sender.login }}"
-    with open(os.environ["local_file"], "rb") as artifact_file:
-      metadata["v8-md5"] = hashlib.md5(artifact_file.read()).hexdigest()
-    metadata["v8-revision"] = "${{ github.event.inputs.v8_revision }}"
-    metadata["v8-head"] = os.environ["v8_head"]
+  #   metadata = {}
+  #   metadata["ci-name"] = "Github Action"
+  #   metadata["ci-id"] = "${{ github.run_id }}"
+  #   metadata["ci-url"] = "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  #   metadata["v8-builder"] = "${{ github.event.sender.login }}"
+  #   with open(os.environ["local_file"], "rb") as artifact_file:
+  #     metadata["v8-md5"] = hashlib.md5(artifact_file.read()).hexdigest()
+  #   metadata["v8-revision"] = "${{ github.event.inputs.v8_revision }}"
+  #   metadata["v8-head"] = os.environ["v8_head"]
 
-    config = CosConfig(Region="${{ secrets.COS_REGION }}", SecretId="${{ secrets.TC_SECRET_ID }}", SecretKey="${{ secrets.TC_SECRET_KEY }}")
-    client = CosS3Client(config)
-    if "${{ github.event.inputs.writing_mode }}" == "preserve" and client.object_exists(
-      Bucket="${{ secrets.COS_BUCKET }}",
-      Key=os.environ["cos_key"]
-    ):
-      raise Exception("Package already exists")
+  #   config = CosConfig(Region="${{ secrets.COS_REGION }}", SecretId="${{ secrets.TC_SECRET_ID }}", SecretKey="${{ secrets.TC_SECRET_KEY }}")
+  #   client = CosS3Client(config)
+  #   if "${{ github.event.inputs.writing_mode }}" == "preserve" and client.object_exists(
+  #     Bucket="${{ secrets.COS_BUCKET }}",
+  #     Key=os.environ["cos_key"]
+  #   ):
+  #     raise Exception("Package already exists")
 
-    response = client.upload_file(
-      Bucket="${{ secrets.COS_BUCKET }}",
-      Key=os.environ["cos_key"],
-      LocalFilePath=os.environ["local_file"],
-      EnableMD5=True,
-      ContentMD5=metadata["v8-md5"],
-      Metadata={"x-cos-tagging": urlencode(metadata)}
-    )
-    print("ETag: " + response["ETag"])
+  #   response = client.upload_file(
+  #     Bucket="${{ secrets.COS_BUCKET }}",
+  #     Key=os.environ["cos_key"],
+  #     LocalFilePath=os.environ["local_file"],
+  #     EnableMD5=True,
+  #     ContentMD5=metadata["v8-md5"],
+  #     Metadata={"x-cos-tagging": urlencode(metadata)}
+  #   )
+  #   print("ETag: " + response["ETag"])
 
   cmakelists_template: |
     #
@@ -131,17 +131,17 @@ env:
         INTERFACE ${{ '${{PROJECT_NAME}}' }}_library)
 
 jobs:
-  context_in_lowercase:
-    if: github.event.inputs.is_build_for_android == 'true' || github.event.inputs.is_build_for_linux == 'true'
-    runs-on: ubuntu-latest
-    outputs:
-      repository_owner: ${{ steps.get_owner.outputs.lowercase }}
-    steps:
-      - name: Get repo owner(in lowercase)
-        id: get_owner
-        uses: ASzc/change-string-case-action@v2
-        with:
-          string: ${{ github.repository_owner }}
+  # context_in_lowercase:
+  #   if: github.event.inputs.is_build_for_android == 'true' || github.event.inputs.is_build_for_linux == 'true'
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     repository_owner: ${{ steps.get_owner.outputs.lowercase }}
+  #   steps:
+  #     - name: Get repo owner(in lowercase)
+  #       id: get_owner
+  #       uses: ASzc/change-string-case-action@v2
+  #       with:
+  #         string: ${{ github.repository_owner }}
 
   android_prebuilt:
     if: github.event.inputs.is_build_for_android == 'true'
