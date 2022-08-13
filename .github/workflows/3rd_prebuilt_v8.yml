@@ -243,10 +243,15 @@ jobs:
         cd v8
         git checkout ${{ github.event.inputs.v8_revision }}
         gclient sync -D
+    - name: Fetch patch
+      uses: actions/checkout@v2
+      with:
+        path: ${{ github.repository }}
     - name: Apply std::same compiler error
       if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
       working-directory: ./v8/
       run: |
+        pwd
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
@@ -369,6 +374,10 @@ jobs:
         export PATH=/usr/local/opt/depot_tools:$PATH
         echo "target_os = ['ios']" >> ../.gclient
         gclient sync -D
+    - name: Fetch patch
+      uses: actions/checkout@v2
+      with:
+        path: ${{ github.repository }}
     - name: Apply std::same compiler error
       if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
       working-directory: ./v8/
