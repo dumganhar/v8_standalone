@@ -146,9 +146,7 @@ jobs:
   android_prebuilt:
     if: github.event.inputs.is_build_for_android == 'true'
     needs: context_in_lowercase
-    runs-on: [self-hosted, linux]
-    container:
-      image: ghcr.io/${{ needs.context_in_lowercase.outputs.repository_owner }}/android-release:latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         cpu: [arm, arm64, x86, x64]
@@ -372,9 +370,7 @@ jobs:
   linux_prebuilt:
     if: github.event.inputs.is_build_for_linux == 'true'
     needs: context_in_lowercase
-    runs-on: [self-hosted, linux]
-    container:
-      image: ghcr.io/${{ needs.context_in_lowercase.outputs.repository_owner }}/linux-release:latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         arch: [x86, x64, arm64, arm]
