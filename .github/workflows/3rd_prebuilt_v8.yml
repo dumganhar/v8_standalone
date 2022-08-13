@@ -68,7 +68,7 @@ jobs:
 
   android_prebuilt:
     if: github.event.inputs.is_build_for_android == 'true'
-    needs: context_in_lowercase
+    # needs: context_in_lowercase
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -292,7 +292,7 @@ jobs:
 
   linux_prebuilt:
     if: github.event.inputs.is_build_for_linux == 'true'
-    needs: context_in_lowercase
+    # needs: context_in_lowercase
     runs-on: ubuntu-latest
     strategy:
       matrix:
