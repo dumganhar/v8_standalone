@@ -89,7 +89,6 @@ jobs:
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
     - name: Fetch v8
       run: |
-        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
         fetch v8
         cd v8
