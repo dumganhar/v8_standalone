@@ -243,6 +243,12 @@ jobs:
         cd v8
         git checkout ${{ github.event.inputs.v8_revision }}
         gclient sync -D
+    - name: Apply std::same compiler error
+      if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
+      working-directory: ./v8/
+      run: |
+        git fetch origin 904c8cedf85c7223f96ea084953089fea9a36bdd
+        git cherry-pick 904c8cedf85c7223f96ea084953089fea9a36bdd
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -364,6 +370,12 @@ jobs:
         export PATH=/usr/local/opt/depot_tools:$PATH
         echo "target_os = ['ios']" >> ../.gclient
         gclient sync -D
+    - name: Apply std::same compiler error
+      if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
+      working-directory: ./v8/
+      run: |
+        git fetch origin 904c8cedf85c7223f96ea084953089fea9a36bdd
+        git cherry-pick 904c8cedf85c7223f96ea084953089fea9a36bdd
     - name: Remove compiler flags
       working-directory: ./v8/build/config/compiler
       run: |
