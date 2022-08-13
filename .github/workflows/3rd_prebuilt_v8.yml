@@ -172,7 +172,8 @@ jobs:
     runs-on: windows-2019
     strategy:
       matrix:
-        arch: [x86, x64, arm64]
+        # arch: [x86, x64, arm64]
+        arch: [x64]
     steps:
     - name: Setup GN
       run: |
