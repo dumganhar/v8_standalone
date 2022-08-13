@@ -148,19 +148,13 @@ jobs:
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
-    # - name: Generate CMakeLists
-    #   uses: DamianReeves/write-file-action@v1.0
-    #   with:
-    #     path: ./v8/out/artifact/CMakeLists.txt
-    #     write-mode: overwrite
-    #     contents: ${{ format(env.cmakelists_template, (!startsWith(github.event.inputs.v8_revision, '7.7') && endsWith(matrix.arch, '64')) && 'INTERFACE "-DV8_COMPRESS_POINTERS"' || '', '${CMAKE_CURRENT_SOURCE_DIR}/lib/libv8_monolith.a') }}
-    # - name: Release package
-    #   id: release_package
-    #   working-directory: ./v8
-    #   run: |
-    #     echo "::set-output name=head_full::$(git rev-parse HEAD)"
-    #     cd out
-    #     tar -zcvf android-${{ matrix.arch }}.tgz -C artifact .
+    - name: Release package
+      id: release_package
+      working-directory: ./v8
+      run: |
+        echo "::set-output name=head_full::$(git rev-parse HEAD)"
+        cd out
+        tar -zcvf android-${{ matrix.arch }}.tgz -C artifact .
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -212,19 +206,13 @@ jobs:
         Copy-Item -r ../include/* artifact/include/v8/
         Copy-Item -r gen/include/* artifact/include/v8/
         Get-ChildItem -Exclude *.h -Recurse -File -Path artifact/include/v8 | Remove-Item
-    # - name: Generate CMakeLists
-    #   uses: DamianReeves/write-file-action@v1.0
-    #   with:
-    #     path: ./v8/out/artifact/CMakeLists.txt
-    #     write-mode: overwrite
-    #     contents: ${{ format(env.cmakelists_template, endsWith(matrix.arch, '64') && 'INTERFACE "-DV8_COMPRESS_POINTERS"' || '', '${CMAKE_CURRENT_SOURCE_DIR}/lib/v8_monolith.lib') }}
-    # - name: Release package
-    #   id: release_package
-    #   working-directory: ./v8
-    #   run: |
-    #     Write-Output "::set-output name=head_full::$(git rev-parse HEAD)"
-    #     cd out
-    #     Compress-Archive -Path artifact\* -DestinationPath windows-${{ matrix.arch }}.zip
+    - name: Release package
+      id: release_package
+      working-directory: ./v8
+      run: |
+        Write-Output "::set-output name=head_full::$(git rev-parse HEAD)"
+        cd out
+        Compress-Archive -Path artifact\* -DestinationPath windows-${{ matrix.arch }}.zip
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -273,19 +261,13 @@ jobs:
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
-    # - name: Generate CMakeLists
-    #   uses: DamianReeves/write-file-action@v1.0
-    #   with:
-    #     path: ./v8/out/artifact/CMakeLists.txt
-    #     write-mode: overwrite
-    #     contents: ${{ format(env.cmakelists_template, endsWith(matrix.arch, '64') && 'INTERFACE "-DV8_COMPRESS_POINTERS"' || '', '${CMAKE_CURRENT_SOURCE_DIR}/lib/libv8_monolith.a') }}
-    # - name: Release package
-    #   id: release_package
-    #   working-directory: ./v8
-    #   run: |
-    #     echo "::set-output name=head_full::$(git rev-parse HEAD)"
-    #     cd out
-    #     tar -zcvf macos-${{ matrix.arch }}.tgz -C artifact .
+    - name: Release package
+      id: release_package
+      working-directory: ./v8
+      run: |
+        echo "::set-output name=head_full::$(git rev-parse HEAD)"
+        cd out
+        tar -zcvf macos-${{ matrix.arch }}.tgz -C artifact .
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -340,19 +322,13 @@ jobs:
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
-    # - name: Generate CMakeLists
-    #   uses: DamianReeves/write-file-action@v1.0
-    #   with:
-    #     path: ./v8/out/artifact/CMakeLists.txt
-    #     write-mode: overwrite
-    #     contents: ${{ format(env.cmakelists_template, endsWith(matrix.arch, '64') && 'INTERFACE "-DV8_COMPRESS_POINTERS"' || '', '${CMAKE_CURRENT_SOURCE_DIR}/lib/libv8_monolith.a') }}
-    # - name: Release package
-    #   id: release_package
-    #   working-directory: ./v8
-    #   run: |
-    #     echo "::set-output name=head_full::$(git rev-parse HEAD)"
-    #     cd out
-    #     tar -zcvf linux-${{ matrix.arch }}.tgz -C artifact .
+    - name: Release package
+      id: release_package
+      working-directory: ./v8
+      run: |
+        echo "::set-output name=head_full::$(git rev-parse HEAD)"
+        cd out
+        tar -zcvf linux-${{ matrix.arch }}.tgz -C artifact .
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -412,19 +388,13 @@ jobs:
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
-    # - name: Generate CMakeLists
-    #   uses: DamianReeves/write-file-action@v1.0
-    #   with:
-    #     path: ./v8/out/artifact/CMakeLists.txt
-    #     write-mode: overwrite
-    #     contents: ${{ format(env.cmakelists_template, '', '${CMAKE_CURRENT_SOURCE_DIR}/lib/libv8_monolith.a') }}
-    # - name: Release package
-    #   id: release_package
-    #   working-directory: ./v8
-    #   run: |
-    #     echo "::set-output name=head_full::$(git rev-parse HEAD)"
-    #     cd out
-    #     tar -zcvf ios-${{ matrix.arch }}.tgz -C artifact .
+    - name: Release package
+      id: release_package
+      working-directory: ./v8
+      run: |
+        echo "::set-output name=head_full::$(git rev-parse HEAD)"
+        cd out
+        tar -zcvf ios-${{ matrix.arch }}.tgz -C artifact .
     # - name: Install Requirement
     #   shell: bash
     #   run: |
