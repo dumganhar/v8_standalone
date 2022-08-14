@@ -13,16 +13,6 @@ on:
         type: string
         default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=false'
         required: true
-      # package_tag:
-      #   description: 'Package TAG'
-      #   type: string
-      #   default: '10.4.132.22'
-      #   required: true
-      # hip_v8_root:
-      #   description: 'HIP V8 root path'
-      #   type: string
-      #   default: 'global_packages'
-      #   require: true
       is_build_for_android:
         description: 'Build for Android platform'
         type: boolean
@@ -46,21 +36,8 @@ on:
 
 
 jobs:
-  # context_in_lowercase:
-  #   if: github.event.inputs.is_build_for_android == 'true' || github.event.inputs.is_build_for_linux == 'true'
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     repository_owner: ${{ steps.get_owner.outputs.lowercase }}
-  #   steps:
-  #     - name: Get repo owner(in lowercase)
-  #       id: get_owner
-  #       uses: ASzc/change-string-case-action@v2
-  #       with:
-  #         string: ${{ github.repository_owner }}
-
   android_prebuilt:
     if: github.event.inputs.is_build_for_android == 'true'
-    # needs: context_in_lowercase
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -75,6 +52,35 @@ jobs:
         - cpu: x64
           arch: x86_64
     steps:
+    - uses: actions/setup-python@v2
+    - name: Check workflow input version
+      if: github.event.inputs.is_build_for_android == 'true'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + ${{ github.event.inputs.v8_revision }})
+
+    - name: Check release version
+      if: github.event_name == 'release'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          import re
+          import sys
+          pattern = r'\d+\.(?:\d+\.)*\d+'
+          result=re.findall(pattern, "${{ github.event.release.name }}")
+          if len(result) < 1:
+              sys.exit(-1)
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + result[0])
+
+    - run: echo ${{ env.v8_version }}
+
     - name: Setup GN
       run: |
         git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
@@ -84,7 +90,7 @@ jobs:
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
         fetch v8
         cd v8
-        git checkout ${{ github.event.inputs.v8_revision }}
+        git checkout ${{ env.v8_version }}
     - name: Fetch patch
       uses: actions/checkout@v2
       with:
@@ -147,6 +153,14 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf android-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload to Release
+      if: github.event_name == 'release'
+      uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./v8/out/android-${{ matrix.arch }}.tgz
+        asset_name: android-${{ matrix.arch }}.tgz
+        tag: ${{ github.ref }}
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -167,6 +181,35 @@ jobs:
         # arch: [x86, x64, arm64]
         arch: [x64]
     steps:
+    - uses: actions/setup-python@v2
+    - name: Check workflow input version
+      if: github.event.inputs.is_build_for_windows == 'true'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + ${{ github.event.inputs.v8_revision }})
+
+    - name: Check release version
+      if: github.event_name == 'release'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          import re
+          import sys
+          pattern = r'\d+\.(?:\d+\.)*\d+'
+          result=re.findall(pattern, "${{ github.event.release.name }}")
+          if len(result) < 1:
+              sys.exit(-1)
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + result[0])
+
+    - run: echo ${{ env.v8_version }}
+
     - name: Setup GN
       run: |
         Invoke-WebRequest -OutFile depot_tools.zip https://storage.googleapis.com/chrome-infra/depot_tools.zip
@@ -176,9 +219,9 @@ jobs:
       run: |
         $env:DEPOT_TOOLS_WIN_TOOLCHAIN = 0
         $env:Path += ";C:\depot_tools"
-        fetch v8
-        cd v8
-        git checkout ${{ github.event.inputs.v8_revision }}
+        fetch v8 &&
+        cd v8 &&
+        git checkout ${{ env.v8_version }} &&
         gclient sync -D
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
@@ -206,6 +249,14 @@ jobs:
         Write-Output "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         Compress-Archive -Path artifact\* -DestinationPath windows-${{ matrix.arch }}.zip
+    - name: Upload to Release
+      if: github.event_name == 'release'
+      uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./v8/out/windows-${{ matrix.arch }}.zip
+        asset_name: windows-${{ matrix.arch }}.zip
+        tag: ${{ github.ref }}
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -225,6 +276,35 @@ jobs:
       matrix:
         arch: [x64, arm64]
     steps:
+    - uses: actions/setup-python@v2
+    - name: Check workflow input version
+      if: github.event.inputs.is_build_for_macos == 'true'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + ${{ github.event.inputs.v8_revision }})
+
+    - name: Check release version
+      if: github.event_name == 'release'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          import re
+          import sys
+          pattern = r'\d+\.(?:\d+\.)*\d+'
+          result=re.findall(pattern, "${{ github.event.release.name }}")
+          if len(result) < 1:
+              sys.exit(-1)
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + result[0])
+
+    - run: echo ${{ env.v8_version }}
+
     - name: Setup GN
       run: |
         git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /usr/local/opt/depot_tools
@@ -234,7 +314,7 @@ jobs:
         export PATH=/usr/local/opt/depot_tools:$PATH
         fetch v8
         cd v8
-        git checkout ${{ github.event.inputs.v8_revision }}
+        git checkout ${{ env.v8_version }}
         gclient sync -D
     - name: Fetch patch
       uses: actions/checkout@v2
@@ -271,6 +351,14 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf macos-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload to Release
+      if: github.event_name == 'release'
+      uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./v8/out/macos-${{ matrix.arch }}.tgz
+        asset_name: macos-${{ matrix.arch }}.tgz
+        tag: ${{ github.ref }}
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -285,12 +373,40 @@ jobs:
 
   linux_prebuilt:
     if: github.event.inputs.is_build_for_linux == 'true'
-    # needs: context_in_lowercase
     runs-on: ubuntu-latest
     strategy:
       matrix:
         arch: [x86, x64, arm64, arm]
     steps:
+    - uses: actions/setup-python@v2
+    - name: Check workflow input version
+      if: github.event.inputs.is_build_for_linux == 'true'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + ${{ github.event.inputs.v8_revision }})
+
+    - name: Check release version
+      if: github.event_name == 'release'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          import re
+          import sys
+          pattern = r'\d+\.(?:\d+\.)*\d+'
+          result=re.findall(pattern, "${{ github.event.release.name }}")
+          if len(result) < 1:
+              sys.exit(-1)
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + result[0])
+
+    - run: echo ${{ env.v8_version }}
+
     - name: Setup GN
       run: |
         git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
@@ -300,7 +416,7 @@ jobs:
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
         fetch v8
         cd v8
-        git checkout ${{ github.event.inputs.v8_revision }}
+        git checkout ${{ env.v8_version }}
         gclient sync -D
     - name: Install sysroot(${{ matrix.arch }})
       if: ${{ contains(matrix.arch, 'arm') }}
@@ -332,6 +448,14 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf linux-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload to Release
+      if: github.event_name == 'release'
+      uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./v8/out/linux-${{ matrix.arch }}.tgz
+        asset_name: linux-${{ matrix.arch }}.tgz
+        tag: ${{ github.ref }}
     # - name: Install Requirement
     #   shell: bash
     #   run: |
@@ -351,6 +475,35 @@ jobs:
       matrix:
         arch: [x64, arm64]
     steps:
+    - uses: actions/setup-python@v2
+    - name: Check workflow input version
+      if: github.event.inputs.is_build_for_ios == 'true'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + ${{ github.event.inputs.v8_revision }})
+
+    - name: Check release version
+      if: github.event_name == 'release'
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          import re
+          import sys
+          pattern = r'\d+\.(?:\d+\.)*\d+'
+          result=re.findall(pattern, "${{ github.event.release.name }}")
+          if len(result) < 1:
+              sys.exit(-1)
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as f:
+              f.write("v8_version=" + result[0])
+
+    - run: echo ${{ env.v8_version }}
+
     - name: Setup GN
       run: |
         git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /usr/local/opt/depot_tools
@@ -407,6 +560,14 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf ios-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload to Release
+      if: github.event_name == 'release'
+      uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./v8/out/ios-${{ matrix.arch }}.tgz
+        asset_name: ios-${{ matrix.arch }}.tgz
+        tag: ${{ github.ref }}
     # - name: Install Requirement
     #   shell: bash
     #   run: |
