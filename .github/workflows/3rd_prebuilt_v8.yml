@@ -1,6 +1,8 @@
 name: '[3rd] prebuilt v8'
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       v8_revision:
