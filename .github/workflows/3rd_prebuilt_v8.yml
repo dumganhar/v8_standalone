@@ -13,7 +13,7 @@ on:
       build_args:
         description: 'Build args'
         type: string
-        default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=false'
+        default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=true'
         required: true
       is_build_for_android:
         description: 'Build for Android platform'
@@ -36,6 +36,8 @@ on:
         type: boolean
         default: false
 
+env:
+  build_args_release: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=true'
 
 jobs:
   android_prebuilt:
@@ -63,7 +65,8 @@ jobs:
           import os
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}")
+              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}\n")
+              f.write("v8_build_args=" + "${{ github.event.inputs.build_args }}\n")
 
     - name: Check release version
       if: github.event_name == 'release'
@@ -79,9 +82,15 @@ jobs:
               sys.exit(-1)
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + result[0])
+              f.write("v8_version=" + result[0] + "\n")
+              f.write("v8_build_args=" + "${{ env.build_args_release }}\n")
 
-    - run: echo ${{ env.v8_version }}
+    - name: Print env
+      run: |
+        echo "${{ env.v8_version }}"
+        echo "------"
+        echo "${{ env.v8_build_args }}"
+        echo "------"
 
     - name: Setup GN
       run: |
@@ -134,7 +143,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
-        gn gen out --args="target_os=\"android\" target_cpu=\"${{ matrix.cpu }}\" v8_target_cpu=\"${{ matrix.cpu }}\" android_ndk_root=\"${ANDROID_NDK_HOME}\" is_component_build=false v8_monolithic=true android32_ndk_api_level=21 android64_ndk_api_level=21 clang_use_chrome_plugins=false use_thin_lto=false use_custom_libcxx=false ${{ github.event.inputs.build_args }}"
+        gn gen out --args="target_os=\"android\" target_cpu=\"${{ matrix.cpu }}\" v8_target_cpu=\"${{ matrix.cpu }}\" android_ndk_root=\"${ANDROID_NDK_HOME}\" is_component_build=false v8_monolithic=true android32_ndk_api_level=21 android64_ndk_api_level=21 clang_use_chrome_plugins=false use_thin_lto=false use_custom_libcxx=false ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -155,6 +164,12 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf android-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload Artifact
+      if: github.event.inputs.is_build_for_android == 'true'
+      uses: actions/upload-artifact@v3
+      with: 
+        name: android-${{ matrix.arch }}.zip
+        path: artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -163,17 +178,6 @@ jobs:
         file: ./v8/out/android-${{ matrix.arch }}.tgz
         asset_name: android-${{ matrix.arch }}.tgz
         tag: ${{ github.ref }}
-    # - name: Install Requirement
-    #   shell: bash
-    #   run: |
-    #     pip3 install -U cos-python-sdk-v5
-    # - name: Publish package
-    #   shell: python3 {0}
-    #   env:
-    #     local_file: ./v8/out/android-${{ matrix.arch }}.tgz
-    #     cos_key: hippy/${{ github.event.inputs.hip_v8_root }}/v8/${{ github.event.inputs.package_tag }}/android-${{ matrix.arch }}.tgz
-    #     v8_head: ${{ steps.release_package.outputs.head_full }}
-    #   run: ${{ env.publish_package_script }}
 
   windows_prebuilt:
     if: github.event.inputs.is_build_for_windows == 'true' || github.event_name == 'release'
@@ -192,7 +196,8 @@ jobs:
           import os
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}")
+              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}\n")
+              f.write("v8_build_args=" + "${{ github.event.inputs.build_args }}\n")
 
     - name: Check release version
       if: github.event_name == 'release'
@@ -208,9 +213,15 @@ jobs:
               sys.exit(-1)
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + result[0])
+              f.write("v8_version=" + result[0] + "\n")
+              f.write("v8_build_args=" + "${{ env.build_args_release }}\n")
 
-    - run: echo ${{ env.v8_version }}
+    - name: Print env
+      run: |
+        echo "${{ env.v8_version }}"
+        echo "------"
+        echo "${{ env.v8_build_args }}"
+        echo "------"
 
     - name: Setup GN
       run: |
@@ -230,7 +241,7 @@ jobs:
       run: |
         $env:DEPOT_TOOLS_WIN_TOOLCHAIN = 0
         $env:Path += ";C:\depot_tools"
-        gn gen out --args="target_cpu=""""""${{ matrix.arch }}"""""" v8_target_cpu=""""""${{ matrix.arch }}"""""" is_component_build=false v8_monolithic=true chrome_pgo_phase=0 ${{ github.event.inputs.build_args }}"
+        gn gen out --args="target_cpu=""""""${{ matrix.arch }}"""""" v8_target_cpu=""""""${{ matrix.arch }}"""""" is_component_build=false v8_monolithic=true chrome_pgo_phase=0 ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -251,6 +262,12 @@ jobs:
         Write-Output "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         Compress-Archive -Path artifact\* -DestinationPath windows-${{ matrix.arch }}.zip
+    - name: Upload Artifact
+      if: github.event.inputs.is_build_for_windows == 'true'
+      uses: actions/upload-artifact@v3
+      with: 
+        name: windows-${{ matrix.arch }}.zip
+        path: artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -259,17 +276,6 @@ jobs:
         file: ./v8/out/windows-${{ matrix.arch }}.zip
         asset_name: windows-${{ matrix.arch }}.zip
         tag: ${{ github.ref }}
-    # - name: Install Requirement
-    #   shell: bash
-    #   run: |
-    #     pip install -U cos-python-sdk-v5
-    # - name: Publish package
-    #   shell: python
-    #   env:
-    #     local_file: ./v8/out/windows-${{ matrix.arch }}.zip
-    #     cos_key: hippy/${{ github.event.inputs.hip_v8_root }}/v8/${{ github.event.inputs.package_tag }}/windows-${{ matrix.arch }}.zip
-    #     v8_head: ${{ steps.release_package.outputs.head_full
-    #   run: ${{ env.publish_package_script }}
 
   macos_prebuilt:
     if: github.event.inputs.is_build_for_macos == 'true' || github.event_name == 'release'
@@ -287,7 +293,8 @@ jobs:
           import os
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}")
+              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}\n")
+              f.write("v8_build_args=" + "${{ github.event.inputs.build_args }}\n")
 
     - name: Check release version
       if: github.event_name == 'release'
@@ -303,9 +310,15 @@ jobs:
               sys.exit(-1)
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + result[0])
+              f.write("v8_version=" + result[0] + "\n")
+              f.write("v8_build_args=" + "${{ env.build_args_release }}\n")
 
-    - run: echo ${{ env.v8_version }}
+    - name: Print env
+      run: |
+        echo "${{ env.v8_version }}"
+        echo "------"
+        echo "${{ env.v8_build_args }}"
+        echo "------"
 
     - name: Setup GN
       run: |
@@ -332,7 +345,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=/usr/local/opt/depot_tools:$PATH
-        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true ${{ github.event.inputs.build_args }}"
+        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -353,6 +366,12 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf macos-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload Artifact
+      if: github.event.inputs.is_build_for_macos == 'true'
+      uses: actions/upload-artifact@v3
+      with: 
+        name: macos-${{ matrix.arch }}.zip
+        path: artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -361,17 +380,6 @@ jobs:
         file: ./v8/out/macos-${{ matrix.arch }}.tgz
         asset_name: macos-${{ matrix.arch }}.tgz
         tag: ${{ github.ref }}
-    # - name: Install Requirement
-    #   shell: bash
-    #   run: |
-    #     pip install -U cos-python-sdk-v5
-    # - name: Publish package
-    #   shell: python
-    #   env:
-    #     local_file: ./v8/out/macos-${{ matrix.arch }}.tgz
-    #     cos_key: hippy/${{ github.event.inputs.hip_v8_root }}/v8/${{ github.event.inputs.package_tag }}/macos-${{ matrix.arch }}.tgz
-    #     v8_head: ${{ steps.release_package.outputs.head_full }}
-    #   run: ${{ env.publish_package_script }}
 
   linux_prebuilt:
     if: github.event.inputs.is_build_for_linux == 'true' || github.event_name == 'release'
@@ -389,7 +397,8 @@ jobs:
           import os
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}")
+              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}\n")
+              f.write("v8_build_args=" + "${{ github.event.inputs.build_args }}\n")
 
     - name: Check release version
       if: github.event_name == 'release'
@@ -405,9 +414,15 @@ jobs:
               sys.exit(-1)
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + result[0])
+              f.write("v8_version=" + result[0] + "\n")
+              f.write("v8_build_args=" + "${{ env.build_args_release }}\n")
 
-    - run: echo ${{ env.v8_version }}
+    - name: Print env
+      run: |
+        echo "${{ env.v8_version }}"
+        echo "------"
+        echo "${{ env.v8_build_args }}"
+        echo "------"
 
     - name: Setup GN
       run: |
@@ -429,7 +444,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
-        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true ${{ github.event.inputs.build_args }}"
+        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -450,6 +465,12 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf linux-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload Artifact
+      if: github.event.inputs.is_build_for_linux == 'true'
+      uses: actions/upload-artifact@v3
+      with: 
+        name: linux-${{ matrix.arch }}.zip
+        path: artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -486,7 +507,8 @@ jobs:
           import os
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}")
+              f.write("v8_version=" + "${{ github.event.inputs.v8_revision }}\n")
+              f.write("v8_build_args=" + "${{ github.event.inputs.build_args }}\n")
 
     - name: Check release version
       if: github.event_name == 'release'
@@ -502,9 +524,15 @@ jobs:
               sys.exit(-1)
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as f:
-              f.write("v8_version=" + result[0])
+              f.write("v8_version=" + result[0] + "\n")
+              f.write("v8_build_args=" + "${{ env.build_args_release }}\n")
 
-    - run: echo ${{ env.v8_version }}
+    - name: Print env
+      run: |
+        echo "${{ env.v8_version }}"
+        echo "------"
+        echo "${{ env.v8_build_args }}"
+        echo "------"
 
     - name: Setup GN
       run: |
@@ -541,7 +569,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=/usr/local/opt/depot_tools:$PATH
-        gn gen out --args="target_os=\"ios\" target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" is_component_build=false v8_monolithic=true chrome_pgo_phase=0 enable_ios_bitcode=true ios_deployment_target=10 v8_enable_pointer_compression=false use_custom_libcxx=false ios_enable_code_signing=false ${{ github.event.inputs.build_args }}"
+        gn gen out --args="target_os=\"ios\" target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" is_component_build=false v8_monolithic=true chrome_pgo_phase=0 enable_ios_bitcode=true ios_deployment_target=10 v8_enable_pointer_compression=false use_custom_libcxx=false ios_enable_code_signing=false ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -562,6 +590,12 @@ jobs:
         echo "::set-output name=head_full::$(git rev-parse HEAD)"
         cd out
         tar -zcvf ios-${{ matrix.arch }}.tgz -C artifact .
+    - name: Upload Artifact
+      if: github.event.inputs.is_build_for_ios == 'true'
+      uses: actions/upload-artifact@v3
+      with: 
+        name: ios-${{ matrix.arch }}.zip
+        path: artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
