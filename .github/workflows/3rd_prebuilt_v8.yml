@@ -169,7 +169,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with: 
         name: android-${{ matrix.arch }}.zip
-        path: artifact
+        path: ./v8/out/artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -267,7 +267,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with: 
         name: windows-${{ matrix.arch }}.zip
-        path: artifact
+        path: ./v8/out/artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -371,7 +371,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with: 
         name: macos-${{ matrix.arch }}.zip
-        path: artifact
+        path: ./v8/out/artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -470,7 +470,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with: 
         name: linux-${{ matrix.arch }}.zip
-        path: artifact
+        path: ./v8/out/artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
@@ -595,7 +595,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with: 
         name: ios-${{ matrix.arch }}.zip
-        path: artifact
+        path: ./v8/out/artifact
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
