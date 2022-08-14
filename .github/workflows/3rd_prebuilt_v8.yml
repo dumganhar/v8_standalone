@@ -13,7 +13,7 @@ on:
       build_args:
         description: 'Build args'
         type: string
-        default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=true'
+        default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=0 v8_enable_webassembly=true'
         required: true
       is_build_for_android:
         description: 'Build for Android platform'
@@ -37,7 +37,7 @@ on:
         default: false
 
 env:
-  build_args_release: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=true'
+  build_args_release: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=0 v8_enable_webassembly=true'
 
 jobs:
   android_prebuilt:
