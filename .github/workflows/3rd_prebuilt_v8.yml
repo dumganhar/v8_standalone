@@ -543,7 +543,7 @@ jobs:
         export PATH=/usr/local/opt/depot_tools:$PATH
         fetch v8
         cd v8
-        git checkout ${{ github.event.inputs.v8_revision }}
+        git checkout ${{ env.v8_version }}
     - name: Sync third_party
       working-directory: ./v8
       run: |
