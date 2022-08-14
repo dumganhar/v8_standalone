@@ -39,7 +39,7 @@ on:
 
 jobs:
   android_prebuilt:
-    if: github.event.inputs.is_build_for_android == 'true'
+    if: github.event.inputs.is_build_for_android == 'true' || github.event_name == 'release'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -176,7 +176,7 @@ jobs:
     #   run: ${{ env.publish_package_script }}
 
   windows_prebuilt:
-    if: github.event.inputs.is_build_for_windows == 'true'
+    if: github.event.inputs.is_build_for_windows == 'true' || github.event_name == 'release'
     runs-on: windows-2019
     strategy:
       matrix:
@@ -272,7 +272,7 @@ jobs:
     #   run: ${{ env.publish_package_script }}
 
   macos_prebuilt:
-    if: github.event.inputs.is_build_for_macos == 'true'
+    if: github.event.inputs.is_build_for_macos == 'true' || github.event_name == 'release'
     runs-on: macos-latest
     strategy:
       matrix:
@@ -374,7 +374,7 @@ jobs:
     #   run: ${{ env.publish_package_script }}
 
   linux_prebuilt:
-    if: github.event.inputs.is_build_for_linux == 'true'
+    if: github.event.inputs.is_build_for_linux == 'true' || github.event_name == 'release'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -471,7 +471,7 @@ jobs:
     #   run: ${{ env.publish_package_script }}
 
   ios_prebuilt:
-    if: github.event.inputs.is_build_for_ios == 'true'
+    if: github.event.inputs.is_build_for_ios == 'true' || github.event_name == 'release'
     runs-on: macos-latest
     strategy:
       matrix:
