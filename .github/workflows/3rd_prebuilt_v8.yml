@@ -107,7 +107,7 @@ jobs:
       with:
         path: ${{ github.repository }}
     - name: Apply patch
-      if: ${{ !startsWith(github.event.inputs.v8_revision, '7.7') }}
+      if: ${{ !startsWith(env.v8_version, '7.7') }}
       working-directory: ./v8
       continue-on-error: true
       run: |
@@ -119,7 +119,7 @@ jobs:
         echo "target_os = ['android']" >> ../.gclient
         gclient sync -D
     - name: Prepare android_ndk
-      if: ${{ startsWith(github.event.inputs.v8_revision, '7.7') }}
+      if: ${{ startsWith(env.v8_version, '7.7') }}
       working-directory: ./v8
       run: |
         if [ -d third_party/android_tools ]; then
@@ -135,7 +135,7 @@ jobs:
           ln -s $ANDROID_NDK_HOME third_party/android_ndk
         fi
     - name: Apply 7.7 build patch
-      if: ${{ startsWith(github.event.inputs.v8_revision, '7.7') }}
+      if: ${{ startsWith(env.v8_version, '7.7') }}
       working-directory: ./v8/build
       run: |
         git apply ../../${{ github.repository }}/.github/workflows/tools/v8_7_7_229_build.patch
@@ -336,7 +336,7 @@ jobs:
       with:
         path: ${{ github.repository }}
     - name: Apply std::same compiler error
-      if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
+      if: ${{ startsWith(env.v8_version, '10.4') }}
       working-directory: ./v8/
       run: |
         pwd
@@ -555,7 +555,7 @@ jobs:
       with:
         path: ${{ github.repository }}
     - name: Apply std::same compiler error
-      if: ${{ startsWith(github.event.inputs.v8_revision, '10.4') }}
+      if: ${{ startsWith(env.v8_version, '10.4') }}
       working-directory: ./v8/
       run: |
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
