@@ -150,7 +150,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
-        ninja -C out v8_monolith
+        ninja -C out v8_monolith d8
     - name: Prepare package
       working-directory: ./v8/out
       run: |
@@ -248,7 +248,7 @@ jobs:
       working-directory: ./v8
       run: |
         $env:Path += ";C:\depot_tools"
-        ninja -C out v8_monolith
+        ninja -C out v8_monolith d8
     - name: Prepare package
       working-directory: ./v8/out
       run: |
@@ -352,7 +352,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=/usr/local/opt/depot_tools:$PATH
-        ninja -C out v8_monolith
+        ninja -C out v8_monolith d8
     - name: Prepare package
       working-directory: ./v8/out
       run: |
@@ -451,7 +451,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
-        ninja -C out v8_monolith
+        ninja -C out v8_monolith d8
     - name: Prepare package
       working-directory: ./v8/out
       run: |
@@ -576,7 +576,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=/usr/local/opt/depot_tools:$PATH
-        ninja -C out v8_monolith
+        ninja -C out v8_monolith d8
     - name: Prepare package
       working-directory: ./v8/out
       run: |
