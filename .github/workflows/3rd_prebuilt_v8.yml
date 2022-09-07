@@ -154,8 +154,9 @@ jobs:
     - name: Prepare package
       working-directory: ./v8/out
       run: |
-        mkdir -p artifact/include/v8 artifact/lib
+        mkdir -p artifact/include/v8 artifact/lib artifact/bin
         cp obj/libv8_monolith.a artifact/lib
+        cp d8 artifact/bin
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
@@ -252,8 +253,9 @@ jobs:
     - name: Prepare package
       working-directory: ./v8/out
       run: |
-        New-Item -type directory -Path artifact/include/v8, artifact/lib
+        New-Item -type directory -Path artifact/include/v8, artifact/lib, artifact/bin
         Copy-Item obj/v8_monolith.lib artifact/lib
+        Copy-Item d8.exe artifact/bin
         Copy-Item -r ../include/* artifact/include/v8/
         Copy-Item -r gen/include/* artifact/include/v8/
         Get-ChildItem -Exclude *.h -Recurse -File -Path artifact/include/v8 | Remove-Item
@@ -356,8 +358,9 @@ jobs:
     - name: Prepare package
       working-directory: ./v8/out
       run: |
-        mkdir -p artifact/include/v8 artifact/lib
+        mkdir -p artifact/include/v8 artifact/lib artifact/bin
         cp obj/libv8_monolith.a artifact/lib
+        cp d8 artifact/bin
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
@@ -455,8 +458,9 @@ jobs:
     - name: Prepare package
       working-directory: ./v8/out
       run: |
-        mkdir -p artifact/include/v8 artifact/lib
+        mkdir -p artifact/include/v8 artifact/lib artifact/bin
         cp obj/libv8_monolith.a artifact/lib
+        cp d8 artifact/bin
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
@@ -580,8 +584,9 @@ jobs:
     - name: Prepare package
       working-directory: ./v8/out
       run: |
-        mkdir -p artifact/include/v8 artifact/lib
+        mkdir -p artifact/include/v8 artifact/lib artifact/bin
         cp obj/libv8_monolith.a artifact/lib
+        cp d8 artifact/bin
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
