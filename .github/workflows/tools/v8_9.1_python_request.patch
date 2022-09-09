@@ -1,0 +1,13 @@
+diff --git a/DEPS b/DEPS
+index b27a4e8e8fa..188e1e18aeb 100644
+--- a/DEPS
++++ b/DEPS
+@@ -300,7 +300,7 @@ deps = {
+     'condition': "checkout_ittapi or check_v8_header_includes",
+   },
+   'third_party/requests': {
+-      'url': Var('chromium_url') + '/external/github.com/kennethreitz/requests.git' + '@' + '2c2138e811487b13020eb331482fb991fd399d4e',
++      'url': 'https://github.com/psf/requests.git' + '@' + '2c2138e811487b13020eb331482fb991fd399d4e',
+       'condition': 'checkout_android',
+   },
+ }
