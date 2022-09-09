@@ -8,12 +8,12 @@ on:
       v8_revision:
         description: 'V8 TAG(Branch) to build'
         type: string
-        default: '10.4.132.22'
+        default: '9.1.269.40'
         required: true
       build_args:
         description: 'Build args'
         type: string
-        default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=0 v8_enable_webassembly=true'
+        default: 'is_debug=false v8_use_external_startup_data=false is_official_build=true v8_enable_i18n_support=false treat_warnings_as_errors=false symbol_level=1 v8_enable_webassembly=true'
         required: true
       is_build_for_android:
         description: 'Build for Android platform'
@@ -111,7 +111,7 @@ jobs:
     - name: Apply patch 9.1
       if: ${{ startsWith(env.v8_version, '9.1') }}
       working-directory: ./v8
-      continue-on-error: true
+      continue-on-error: false
       run: |
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_python_request.patch
     - name: Sync third_party
@@ -145,6 +145,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+        export ANDROID_NDK_HOME=$PWD/third_party/android_ndk
         gn gen out --args="target_os=\"android\" target_cpu=\"${{ matrix.cpu }}\" v8_target_cpu=\"${{ matrix.cpu }}\" android_ndk_root=\"${ANDROID_NDK_HOME}\" is_component_build=false v8_monolithic=true android32_ndk_api_level=18 android64_ndk_api_level=21 clang_use_chrome_plugins=false use_thin_lto=false use_custom_libcxx=false ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
