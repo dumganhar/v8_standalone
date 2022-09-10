@@ -191,7 +191,9 @@ jobs:
         # arch: [x86, x64, arm64]
         arch: [x64]
     steps:
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
     - name: Check workflow input version
       if: github.event.inputs.is_build_for_windows == 'true'
       uses: jannekem/run-python-script-action@v1
@@ -289,7 +291,9 @@ jobs:
       matrix:
         arch: [x64, arm64]
     steps:
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
     - name: Check workflow input version
       if: github.event.inputs.is_build_for_macos == 'true'
       uses: jannekem/run-python-script-action@v1
@@ -394,7 +398,9 @@ jobs:
       matrix:
         arch: [x86, x64, arm64, arm]
     steps:
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
     - name: Check workflow input version
       if: github.event.inputs.is_build_for_linux == 'true'
       uses: jannekem/run-python-script-action@v1
@@ -505,7 +511,9 @@ jobs:
       matrix:
         arch: [x64, arm64]
     steps:
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
     - name: Check workflow input version
       if: github.event.inputs.is_build_for_ios == 'true'
       uses: jannekem/run-python-script-action@v1
