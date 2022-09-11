@@ -247,7 +247,7 @@ jobs:
       run: |
         $env:DEPOT_TOOLS_WIN_TOOLCHAIN = 0
         $env:Path += ";C:\depot_tools"
-        gn gen out --args="target_cpu=""""""${{ matrix.arch }}"""""" v8_target_cpu=""""""${{ matrix.arch }}"""""" is_component_build=false v8_monolithic=true chrome_pgo_phase=0 ${{ env.v8_build_args }}"
+        gn gen out --args="target_cpu=""""""${{ matrix.arch }}"""""" v8_target_cpu=""""""${{ matrix.arch }}"""""" is_component_build=false v8_monolithic=true use_custom_libcxx=false chrome_pgo_phase=0 ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -456,7 +456,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
-        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true ${{ env.v8_build_args }}"
+        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true use_custom_libcxx=false ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
