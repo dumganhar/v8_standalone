@@ -1,0 +1,83 @@
+diff --git a/include/v8config.h b/include/v8config.h
+index acd34d7a1f2..0c9aa5d8e3f 100644
+--- a/include/v8config.h
++++ b/include/v8config.h
+@@ -514,6 +514,13 @@ V8 shared library set USING_V8_SHARED.
+ 
+ #endif  // V8_OS_WIN
+ 
++// pthread_jit_write_protect is only available on arm64 Mac.
++#if defined(V8_OS_MACOSX) && !defined(V8_OS_IOS) && defined(V8_HOST_ARCH_ARM64)
++# define V8_HAS_PTHREAD_JIT_WRITE_PROTECT 1
++#else
++# define V8_HAS_PTHREAD_JIT_WRITE_PROTECT 0
++#endif
++
+ // clang-format on
+ 
+ #undef V8_HAS_CPP_ATTRIBUTE
+diff --git a/src/base/page-allocator.cc b/src/base/page-allocator.cc
+index 1dac872449b..ad0a3cdcc09 100644
+--- a/src/base/page-allocator.cc
++++ b/src/base/page-allocator.cc
+@@ -45,7 +45,7 @@ void* PageAllocator::GetRandomMmapAddr() {
+ 
+ void* PageAllocator::AllocatePages(void* hint, size_t size, size_t alignment,
+                                    PageAllocator::Permission access) {
+-#if !(V8_OS_MACOSX && V8_HOST_ARCH_ARM64 && defined(MAP_JIT))
++#if !V8_HAS_PTHREAD_JIT_WRITE_PROTECT
+   // kNoAccessWillJitLater is only used on Apple Silicon. Map it to regular
+   // kNoAccess on other platforms, so code doesn't have to handle both enum
+   // values.
+diff --git a/src/base/platform/platform-posix.cc b/src/base/platform/platform-posix.cc
+index ee787f7d9ab..321e31b853a 100644
+--- a/src/base/platform/platform-posix.cc
++++ b/src/base/platform/platform-posix.cc
+@@ -153,7 +153,7 @@ int GetFlagsForMemoryPermission(OS::MemoryPermission access,
+     flags |= MAP_LAZY;
+ #endif  // V8_OS_QNX
+   }
+-#if V8_OS_MACOSX && V8_HOST_ARCH_ARM64 && defined(MAP_JIT)
++#if V8_HAS_PTHREAD_JIT_WRITE_PROTECT
+   if (access == OS::MemoryPermission::kNoAccessWillJitLater) {
+     flags |= MAP_JIT;
+   }
+diff --git a/src/trap-handler/trap-handler.h b/src/trap-handler/trap-handler.h
+index fcdc256a38d..60c560e37a1 100644
+--- a/src/trap-handler/trap-handler.h
++++ b/src/trap-handler/trap-handler.h
+@@ -27,7 +27,7 @@ namespace trap_handler {
+ #define V8_TRAP_HANDLER_SUPPORTED true
+ #elif V8_TARGET_ARCH_X64 && V8_OS_FREEBSD
+ #define V8_TRAP_HANDLER_SUPPORTED true
+-#elif V8_HOST_ARCH_ARM64 && V8_TARGET_ARCH_ARM64 && V8_OS_MACOSX
++#elif V8_HOST_ARCH_ARM64 && V8_TARGET_ARCH_ARM64 && V8_OS_MACOSX && !V8_OS_IOS
+ #define V8_TRAP_HANDLER_SUPPORTED true
+ #else
+ #define V8_TRAP_HANDLER_SUPPORTED false
+diff --git a/src/wasm/code-space-access.h b/src/wasm/code-space-access.h
+index 6fd5ad5f9f6..0bf377219c2 100644
+--- a/src/wasm/code-space-access.h
++++ b/src/wasm/code-space-access.h
+@@ -16,7 +16,7 @@
+ namespace v8 {
+ namespace internal {
+ 
+-#if defined(V8_OS_MACOSX) && defined(V8_HOST_ARCH_ARM64)
++#if V8_HAS_PTHREAD_JIT_WRITE_PROTECT
+ 
+ // Ignoring this warning is considered better than relying on
+ // __builtin_available.
+diff --git a/src/wasm/wasm-code-manager.cc b/src/wasm/wasm-code-manager.cc
+index d9225103bbd..c5267d8f89a 100644
+--- a/src/wasm/wasm-code-manager.cc
++++ b/src/wasm/wasm-code-manager.cc
+@@ -51,7 +51,7 @@ namespace wasm {
+ 
+ using trap_handler::ProtectedInstructionData;
+ 
+-#if defined(V8_OS_MACOSX) && defined(V8_HOST_ARCH_ARM64)
++#if V8_HAS_PTHREAD_JIT_WRITE_PROTECT
+ thread_local int CodeSpaceWriteScope::code_space_write_nesting_level_ = 0;
+ #endif
+ 

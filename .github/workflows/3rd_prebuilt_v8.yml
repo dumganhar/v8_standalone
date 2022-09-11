@@ -574,6 +574,11 @@ jobs:
       working-directory: ./v8/
       run: |
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
+    - name: Apply 9.1 ios patch
+      if: ${{ startsWith(env.v8_version, '9.1') }}
+      working-directory: ./v8/
+      run: |
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_v9.1_ios.patch
     - name: Remove compiler flags
       working-directory: ./v8/build/config/compiler
       run: |
