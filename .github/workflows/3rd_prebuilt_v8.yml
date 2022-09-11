@@ -354,7 +354,7 @@ jobs:
       working-directory: ./v8
       run: |
         export PATH=/usr/local/opt/depot_tools:$PATH
-        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true use_custom_libcxx=false use_xcode_clang=true ${{ env.v8_build_args }}"
+        gn gen out --args="target_cpu=\"${{ matrix.arch }}\" v8_target_cpu=\"${{ matrix.arch }}\" chrome_pgo_phase=0 is_component_build=false v8_monolithic=true use_custom_libcxx=false ${{ env.v8_build_args }}"
     - name: Compile ${{ matrix.arch }}
       working-directory: ./v8
       run: |
