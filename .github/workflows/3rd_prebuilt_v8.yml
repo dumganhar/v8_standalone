@@ -109,7 +109,7 @@ jobs:
       with:
         path: ${{ github.repository }}
     - name: Apply patch 9.1
-      if: ${{ startsWith(env.v8_version, '9.1') }}
+      if: ${{ startsWith(env.v8_version, '9.') }}
       working-directory: ./v8
       continue-on-error: false
       run: |
@@ -452,6 +452,9 @@ jobs:
       working-directory: ./v8
       run: |
         build/linux/sysroot_scripts/install-sysroot.py --arch=${{ matrix.arch }}
+    - name: Install Deps
+      run: |
+        sudo apt-get install -y libatomic1
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
       run: |
