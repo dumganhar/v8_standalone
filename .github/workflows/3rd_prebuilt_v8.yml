@@ -114,6 +114,7 @@ jobs:
       continue-on-error: false
       run: |
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_python_request.patch
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
     - name: Apply patch 9.8
       if: ${{ startsWith(env.v8_version, '9.8') }}
       working-directory: ./v8
@@ -248,6 +249,16 @@ jobs:
         cd v8 &&
         git checkout ${{ env.v8_version }} &&
         gclient sync -D
+    - name: Fetch patch
+      uses: actions/checkout@v2
+      with:
+        path: ${{ github.repository }}
+    - name: Apply patch 9.1
+      if: ${{ startsWith(env.v8_version, '9.1') }}
+      working-directory: ./v8
+      continue-on-error: false
+      run: |
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -350,6 +361,12 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: ${{ github.repository }}
+    - name: Apply patch 9.1
+      if: ${{ startsWith(env.v8_version, '9.1') }}
+      working-directory: ./v8
+      continue-on-error: false
+      run: |
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
     - name: Apply std::same compiler error
       if: ${{ startsWith(env.v8_version, '10.4') }}
       working-directory: ./v8/
@@ -453,6 +470,16 @@ jobs:
         cd v8
         git checkout ${{ env.v8_version }}
         gclient sync -D
+    - name: Fetch patch
+      uses: actions/checkout@v2
+      with:
+        path: ${{ github.repository }}
+    - name: Apply patch 9.1
+      if: ${{ startsWith(env.v8_version, '9.1') }}
+      working-directory: ./v8
+      continue-on-error: false
+      run: |
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
     - name: Install sysroot(${{ matrix.arch }})
       if: ${{ contains(matrix.arch, 'arm') }}
       working-directory: ./v8
@@ -575,6 +602,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: ${{ github.repository }}
+      
     - name: Apply std::same compiler error
       if: ${{ startsWith(env.v8_version, '10.4') }}
       working-directory: ./v8/
@@ -585,6 +613,7 @@ jobs:
       working-directory: ./v8/
       run: |
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_v9.1_ios.patch
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
     - name: Remove compiler flags
       working-directory: ./v8/build/config/compiler
       run: |
