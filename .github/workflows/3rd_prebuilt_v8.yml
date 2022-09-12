@@ -109,11 +109,17 @@ jobs:
       with:
         path: ${{ github.repository }}
     - name: Apply patch 9.1
-      if: ${{ startsWith(env.v8_version, '9.') }}
+      if: ${{ startsWith(env.v8_version, '9.1') }}
       working-directory: ./v8
       continue-on-error: false
       run: |
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_python_request.patch
+    - name: Apply patch 9.8
+      if: ${{ startsWith(env.v8_version, '9.8') }}
+      working-directory: ./v8
+      continue-on-error: false
+      run: |
+        git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.8_python_request.patch
     - name: Sync third_party
       working-directory: ./v8
       run: |
