@@ -402,7 +402,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [x86, x64]
+        arch: [x64]
     steps:
     - uses: actions/setup-python@v4
       with:
@@ -458,16 +458,6 @@ jobs:
       working-directory: ./v8
       run: |
         build/linux/sysroot_scripts/install-sysroot.py --arch=${{ matrix.arch }}
-    - name: Install Deps x86
-      if: ${{ contains(matrix.arch, 'x86') }}
-      working-directory: ./v8
-      run: |
-        sudo apt-get install -y libatomic1:i386
-    - name: Install Deps x64
-      if: ${{ contains(matrix.arch, 'x64') }}
-      working-directory: ./v8
-      run: |
-        sudo apt-get install -y libatomic1
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
       run: |
