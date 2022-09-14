@@ -171,7 +171,6 @@ jobs:
       run: |
         mkdir -p artifact/include/v8 artifact/lib artifact/bin
         cp obj/libv8_monolith.a artifact/lib
-        cp d8 artifact/bin
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
@@ -639,7 +638,6 @@ jobs:
       run: |
         mkdir -p artifact/include/v8 artifact/lib artifact/bin
         cp obj/libv8_monolith.a artifact/lib
-        cp d8 artifact/bin
         cp -r ../include/* artifact/include/v8/
         cp -r gen/include/* artifact/include/v8/
         find artifact/include/v8/. ! -name "*.h" -type f -delete
