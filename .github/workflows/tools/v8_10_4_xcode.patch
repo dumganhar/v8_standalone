@@ -1,0 +1,19 @@
+diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
+index df8610696..b53190d01 100644
+--- a/config/compiler/BUILD.gn
++++ b/config/compiler/BUILD.gn
+@@ -1543,10 +1543,10 @@ config("default_warnings") {
+       if (!is_nacl && !(is_chromeos ||
+                         default_toolchain == "//build/toolchain/cros:target")) {
+         # TODO(https://crbug.com/1322823): Remove flags once potential miscompile is investigated.
+-        cflags += [
+-          "-Xclang",
+-          "-no-opaque-pointers",
+-        ]
++        # cflags += [
++        #   "-Xclang",
++        #   "-no-opaque-pointers",
++        # ]
+       }
+ 
+       if (is_fuchsia) {
