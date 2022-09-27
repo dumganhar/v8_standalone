@@ -374,7 +374,8 @@ jobs:
         pwd
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
-        git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_xcode.patch
+        cd build
+        git apply ../../${{ github.repository }}/.github/workflows/tools/v8_10_4_xcode.patch
     - name: Generate ${{ matrix.arch }}
       working-directory: ./v8
       run: |
@@ -612,7 +613,8 @@ jobs:
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_10.4_ios.patch
-        git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_xcode.patch
+        cd build
+        git apply ../../${{ github.repository }}/.github/workflows/tools/v8_10_4_xcode.patch
     - name: Apply 9.1 ios patch
       if: ${{ startsWith(env.v8_version, '9.1') }}
       working-directory: ./v8/
