@@ -612,7 +612,6 @@ jobs:
       run: |
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_10_4_simd.patch
         git apply ../${{ github.repository }}/.github/workflows/tools/v8_9.1_symbol_hidden.patch
-        git apply ../${{ github.repository }}/.github/workflows/tools/v8_10.4_ios.patch
         cd build
         git apply ../../${{ github.repository }}/.github/workflows/tools/v8_10_4_xcode.patch
     - name: Apply 9.1 ios patch
