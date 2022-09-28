@@ -17,3 +17,16 @@ index df8610696..b53190d01 100644
        }
  
        if (is_fuchsia) {
+diff --git a/toolchain/mac/BUILD.gn b/toolchain/mac/BUILD.gn
+index 0d7a71488..8cda9f7c6 100644
+--- a/toolchain/mac/BUILD.gn
++++ b/toolchain/mac/BUILD.gn
+@@ -23,7 +23,7 @@ template("mac_toolchain") {
+ 
+       if (target_os == "ios") {
+         # Use LLD for the host part of a chrome/ios build.
+-        use_lld = true
++        # use_lld = true
+ 
+         # Override `is_component_build` for the host toolchain.
+         # See https://crbug.com/gn/286 for details why this is
